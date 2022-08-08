@@ -4,49 +4,41 @@ include('lib/enviarArquivos.php');
 
 if(isset($_POST['enviar'])) {
     
-    $titulo = $mysqli->escape_string($_POST['titulo']);
-    $descricao_curta = $mysqli->escape_string($_POST['descricao_curta']);
-    $preco = $mysqli->escape_string($_POST['preco']);
-    $conteudo = $mysqli->escape_string($_POST['conteudo']);
+    $nome = $mysqli->escape_string($_POST['nome']);
+    $email = $mysqli->escape_string($_POST['email']);
+    $creditos = $mysqli->escape_string($_POST['creditos']);
+    $senha = $mysqli->escape_string($_POST['senha']);
+    $rsenha = $mysqli->escape_string($_POST['rsenha']);
 
     $erro = array();
-    if(empty($titulo))
-        $erro[] = "Preencha o título";
+    if(empty($nome))
+        $erro[] = "Preencha o nome";
 
-    if(empty($descricao_curta))
-        $erro[] = "Preencha a descrição curta";
+    if(empty($email))
+        $erro[] = "Preencha o e-mail";
 
-    if(empty($preco))
-        $erro[] = "Preencha a preco";
+    if(empty($creditos))
+        $creditos = 0;
 
-    if(empty($conteudo))
-        $erro[] = "Preencha a conteúdo";
+    if(empty($senha))
+        $erro[] = "Preencha o senha";
 
-    if(!isset($_FILES) || !isset($_FILES['imagem']) || $_FILES['imagem']['size'] == 0)
-        $erro[] = "Selecione uma imagem para o conteúdo";
+    if($rsenha != $senha)
+        $erro[] = "As senhas não batem";
 
     if(count($erro) == 0) {
 
-        $deu_certo = enviarArquivos($_FILES['imagem']['error'], $_FILES['imagem']['size'], $_FILES['imagem']['name'], $_FILES['imagem']['tmp_name']);
-        if($deu_certo !== false) {
+        $senha = password_hash($senha, PASSWORD_DEFAULT);
+        $mysqli->query("INSERT INTO usuarios (nome, email, senha, data_cadastro, creditos) VALUES(
+            '$nome', 
+            '$email', 
+            '$senha',
+            NOW(),
+            '$creditos'
+        )");
+        die("<script>location.href=\"index.php?p=gerenciar_usuarios\";</script>");
 
-            $sql_code = "INSERT INTO cursos (titulo, descricao_curta, conteudo, data_cadastro, preco, imagem) 
-            VALUES(
-                '$titulo',
-                '$descricao_curta',
-                '$conteudo',
-                NOW(),
-                '$preco',
-                '$deu_certo'
-            )";
-            $inserido = $mysqli->query($sql_code);
-            if(!$inserido)
-                $erro[] = "Falha ao inserir no banco de dados: " . $mysqli->error;
-            else 
-                die("<script>location.href=\"index.php?p=gerenciar_cursos\";</script>");
 
-        } else 
-            $erro[] = "Falha ao enviar a imagem";
     }
 }
 
@@ -57,7 +49,7 @@ if(isset($_POST['enviar'])) {
         <div class="col-lg-6">
             <div class="page-header-title">
                 <div class="d-inline">
-                    <h4>Cadastrar Curso</h4>
+                    <h4>Cadastrar Usuário</h4>
                     <span>Preencha as informações e clique em salvar</span>
                 </div>
             </div>
@@ -72,10 +64,10 @@ if(isset($_POST['enviar'])) {
                     </li>
                     <li class="breadcrumb-item">
                         <a href="index.php?p=gerenciar_cursos">
-                            Gerenciar Cursos
+                            Gerenciar Usuário
                         </a>
                     </li>
-                    <li class="breadcrumb-item">Cadastrar Curso</li>
+                    <li class="breadcrumb-item">Cadastrar Usuário</li>
                 </ul>
             </div>
         </div>
@@ -100,39 +92,42 @@ if(isset($_POST['enviar'])) {
                     <h5>Formulário de Cadastro</h5>
                 </div>
                 <div class="card-block">
-                    <form action="" method="post" enctype="multipart/form-data">
+                    <form action="" method="post">
                     <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="">Título</label>
-                                    <input type="text" name="titulo" class="form-control">
-                                </div>                            
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="form-group">
-                                    <label for="">Descrição Curta</label>
-                                    <input type="text" name="descricao_curta" class="form-control">
-                                </div>                            
-                            </div><div class="col-lg-8">
-                                <div class="form-group">
-                                    <label for="">Imagem</label>
-                                    <input type="file" name="imagem" class="form-control">
+                                    <label for="">Nome</label>
+                                    <input type="text" name="nome" class="form-control">
                                 </div>                            
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="">Preço</label>
-                                    <input type="text" name="preco" class="form-control">
+                                    <label for="">E-mail</label>
+                                    <input type="text" name="email" class="form-control">
                                 </div>                            
                             </div>
-                            <div class="col-lg-12">
+
+                            <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="">Conteúdo</label>
-                                    <textarea type="text" name="conteudo" rows="10" class="form-control"></textarea>
+                                    <label for="">Créditos</label>
+                                    <input type="text" name="creditos" class="form-control">
                                 </div>                            
                             </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="">Senha</label>
+                                    <input type="text" name="senha" class="form-control">
+                                </div>                            
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="">Repita a senha</label>
+                                    <input type="text" name="rsenha" class="form-control">
+                                </div>                            
+                            </div>
+
                             <div class="col-lg-12">
-                                <a type="button" href="index.php?p=gerenciar_curso" class="btn btn-primary btn-round"><i class="ti-arrow-left"> Voltar</i></a>
+                                <a type="button" href="index.php?p=gerenciar_usuarios" class="btn btn-primary btn-round"><i class="ti-arrow-left"> Voltar</i></a>
                                 <button type="submit" name="enviar" value="1" class="btn btn-success btn-round float-right"><i class="ti-save"> Salvar</i></button>
                             </div>
                         </div>

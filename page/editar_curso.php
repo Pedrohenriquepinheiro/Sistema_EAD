@@ -149,7 +149,7 @@ $curso = $sql_query->fetch_assoc();
                                 </div>                            
                             </div>
                             <div class="col-lg-12">
-                                <a type="button" href="index.php" class="btn btn-primary btn-round"><i class="ti-arrow-left"> Voltar</i></a>
+                                <a type="button" href="index.php?p=gerenciar_cursos" class="btn btn-primary btn-round"><i class="ti-arrow-left"> Voltar</i></a>
                                 <button type="submit" name="enviar" value="1" class="btn btn-success btn-round float-right"><i class="ti-save"> Salvar</i></button>
                             </div>
                         </div>
