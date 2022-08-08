@@ -44,15 +44,15 @@ $num_cursos = $sql_query->num_rows;
                     <span><a href="index.php?p=cadastrar_curso">Clique aqui</a> para cadastrar um curso</span>
                 </div>
                 <div class="card-block table-border-style">
-                    <div class="table-responsive">
+                    <div  class="table-responsive">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Imagem</th>
-                                    <th>Título</th>
-                                    <th>Preço</th>
-                                    <th>Gerenciar</th>
+                                    <th style="text-align: center;">#</th>
+                                    <th style="text-align: center;">Imagem</th>
+                                    <th style="text-align: center;">Título</th>
+                                    <th style="text-align: center;">Preço</th>
+                                    <th style="text-align: center;">Gerenciar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,7 +64,7 @@ $num_cursos = $sql_query->num_rows;
                                     
                                     while($curso = $sql_query->fetch_assoc()) {
                                         ?>
-                                        <tr>
+                                        <tr style="text-align: center;">
                                             <th scope="row"><?php echo $curso['id']; ?></th>
                                             <td><img src="<?php echo $curso['imagem']; ?>" height="50" alt=""></td>
                                             <td><?php echo $curso['titulo']; ?></td>
