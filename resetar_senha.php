@@ -1,9 +1,35 @@
 <?php
 
-?>
+$msg = false;
+if(isset($_POST['email'])) {
+    include('lib/conexao.php');
+    include('lib/generateRandomString.php');
+    include('lib/enviarEmail.php');
+    $email = $mysqli->escape_string($_POST['email']);
+    $sql_query = $mysqli->query("SELECT id, nome FROM usuarios WHERE email = '$email'");
+    $result = $sql_query->fetch_assoc();
 
+    if($result['id']) {
+
+        $nova_senha = generateRandomString(6);
+        $nova_senha_criptografada = password_hash($nova_senha, PASSWORD_DEFAULT);
+        $id_usuario = $result['id'];
+        $mysqli->query("UPDATE usuarios SET senha = '$nova_senha_criptografada' WHERE id = '$id_usuario'");
+        enviarEmail($email, "Sua nova senha na plataforma de EAD", "
+        <h1>Olá " . $result['nome'] . "</h1>
+        <p>Uma nova senha foi definida para a sua conta.</p>
+        <p><b>Nova senha:</b> $nova_senha</p>
+        ");
+        $msg = "Se o seu e-mail existir no banco de dados, uma nova senha será enviada para ele.";
+
+    } else {
+        $msg = "Se o seu e-mail existir no banco de dados, uma nova senha será enviada para ele.";
+    }
+}
+
+?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <title>Entrar</title>
@@ -61,23 +87,30 @@
                 <div class="col-sm-12">
                     <!-- Authentication card start -->
                     <div class="login-card card-block auth-body mr-auto ml-auto">
-                        <form class="md-float-material">
+                        <form method="post" class="md-float-material">
                             <div class="text-center">
-                                <img height="60px" src="assets/images/logo_preto.png" alt="logo.png">
+                                <img height="60" src="assets/images/logo.png" alt="logo.png">
                             </div>
                             <div class="auth-box">
                                 <div class="row m-b-20">
                                     <div class="col-md-12">
-                                        <h3 class="text-left txt-primary">Esqueceu sua senha?</h3>
+                                        <h3 class="text-left txt-primary">Esqueceu sua Senha?</h3>
                                     </div>
                                 </div>
                                 <hr/>
-                                <p style="color:Black;">Digte seu e-mail e a senha será enviado para ele.</p> 
+                                <?php if($msg !== false) {
+                                    ?>
+                                    <div class="alert alert-success" role="alert">
+                                        <?php echo $msg; ?>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                                <p style="color:black;">Digite seu e-mail e a senha será enviada para ele.</p>
                                 <div class="input-group">
                                     <input type="email" name="email" class="form-control" placeholder="Seu e-mail">
                                     <span class="md-line"></span>
                                 </div>
-                               
                                 <div class="row m-t-25 text-left">
                                     <div class="col-sm-12 col-xs-12 forgot-phone">
                                         <a href="login.php" class="text-right f-w-600 text-inverse">Voltar</a>
@@ -85,9 +118,10 @@
                                 </div>
                                 <div class="row m-t-30">
                                     <div class="col-md-12">
-                                        <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20">Enviar minha senha</button>
+                                        <button type="submit" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20">Enviar minha senha</button>
                                     </div>
-                                </div>                               
+                                </div>
+
                             </div>
                         </form>
                         <!-- end of form -->
