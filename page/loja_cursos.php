@@ -1,12 +1,23 @@
- <!-- Page-header start -->
- <div class="page-header card">
+<?php
+include("lib/conexao.php");
+protect(0);
+
+if(!isset($_SESSION))
+    session_start();
+
+$id_usuario = $_SESSION['usuario'];
+$cursos_query = $mysqli->query("SELECT * FROM cursos WHERE id IN (SELECT id_curso FROM relatorio WHERE id_usuario = '$id_usuario')") or die($mysqli->error);
+
+?>
+<!-- Page-header start -->
+<div class="page-header card">
     <div class="row align-items-end">
         <div class="col-lg-8">
             <div class="page-header-title">
                 <div class="d-inline">
-                    <h4>Loja de Cursos</h4>
-                    <span>Adquira nossos cursos usando o seu crédito</span>
-                </div>
+                    <h4>Meus Cursos</h4>
+                    <span>Estes são os cursos que você já possui</span>
+                </div>  
             </div>
         </div>
         <div class="col-lg-4">
@@ -17,8 +28,7 @@
                             <i class="icofont icofont-home"></i>
                         </a>
                     </li>
-                    <li class="breadcrumb-item"><a href="#!">Loja de Curso</a>
-                    </li>
+                    <li class="breadcrumb-item">Meus Cursos</li>
                 </ul>
             </div>
         </div>
@@ -28,19 +38,25 @@
 
 <div class="page-body">
     <div class="row">
+        <?php while($curso = $cursos_query->fetch_assoc()) { ?>
         <div class="col-sm-4">
             <div class="card">
                 <div class="card-header">
-                    <h5>Página Inicial</h5>
+                    <h5><?php echo $curso['titulo']; ?></h5>
                 </div>
                 <div class="card-block">
-                    <img src="https://www.estudiosite.com.br/img/post/odamCoFC3qoYyZm7NDb55b364d7855d80.jpg" class="img-fluid mb-3" alt="">
+                    <img src="<?php echo $curso['imagem']; ?>" class="img-fluid mb-3" alt="">
                     <p>
-                        Na THE NEW SCHOOL nós ensinamos várias cursos interessantes para você de forma acessível,prática e simples.
+                    <?php echo $curso['descricao_curta']; ?>
                     </p>
-                    <button class="btn form-control btn-out-dashed btn-success btn-square">Adquiri Por R$ 45</button>
+                    <form action="index.php">
+                        <input type="hidden" name="p" value="acessar">
+                        <input type="hidden" name="id" value="<?php echo $curso['id']; ?>">
+                        <button type="submit" class="btn form-control btn-out-dashed btn-primary btn-square">Acessar</button> 
+                    </form>
                 </div>
             </div>
         </div>
+        <?php } ?>
     </div>
 </div>

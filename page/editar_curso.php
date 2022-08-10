@@ -1,6 +1,8 @@
  <?php
 include('lib/conexao.php');
 include('lib/enviarArquivos.php');
+include('lib/protect.php');
+protect(1);
 
 $id = intval($_GET['id']);
 

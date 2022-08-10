@@ -4,6 +4,7 @@ include('lib/enviarArquivos.php');
 include('lib/protect.php');
 protect(1);
 
+$id = intval($_GET['id']);
 if(isset($_POST['enviar'])) {
     
     $nome = $mysqli->escape_string($_POST['nome']);
@@ -12,7 +13,6 @@ if(isset($_POST['enviar'])) {
     $senha = $mysqli->escape_string($_POST['senha']);
     $rsenha = $mysqli->escape_string($_POST['rsenha']);
     $admin = $mysqli->escape_string($_POST['admin']);
-
 
     $erro = array();
     if(empty($nome))
@@ -24,28 +24,37 @@ if(isset($_POST['enviar'])) {
     if(empty($creditos))
         $creditos = 0;
 
-    if(empty($senha))
-        $erro[] = "Preencha o senha";
-
     if($rsenha != $senha)
         $erro[] = "As senhas não batem";
 
     if(count($erro) == 0) {
 
-        $senha = password_hash($senha, PASSWORD_DEFAULT);
-        $mysqli->query("INSERT INTO usuarios (nome, email, senha, data_cadastro, creditos, admin) VALUES(
-            '$nome', 
-            '$email', 
-            '$senha',
-            NOW(),
-            '$creditos',
-            '$admin'
-        )");
-        die("<script>location.href=\"index.php?p=gerenciar_usuarios\";</script>");
+        $sql_code = "UPDATE usuariso
+        SET nome = '$nome',
+        email = '$email',
+        creditos = '$creditos',
+        admin = '$admin'
+        WHERE id = '$id'";
 
+        if(!empty($senha)) {
+            $senha = password_hash($senha, PASSWORD_DEFAULT);
+            $sql_code = "UPDATE usuarios
+            SET nome = '$nome',
+            email = '$email',
+            senha = '$senha',
+            creditos = '$creditos',
+            admin = '$admin'
+            WHERE id = '$id'";
+        }
+
+        $mysqli->query($sql_code) or die($mysqli->error);
+        die("<script>location.href=\"index.php?p=gerenciar_usuarios\";</script>");
 
     }
 }
+
+$sql_query = $mysqli->query("SELECT * FROM usuarios WHERE id = '$id'") or die($mysqli->error);
+$usuario = $sql_query->fetch_assoc();
 
 ?>
  <!-- Page-header start -->
@@ -97,54 +106,56 @@ if(isset($_POST['enviar'])) {
                     <h5>Formulário de Cadastro</h5>
                 </div>
                 <div class="card-block">
-                    <form action="" method="post">
-                    <div class="row">
+                    <form action="" method="POST">
+                        <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Nome</label>
-                                    <input type="text" name="nome" class="form-control">
-                                </div>                            
+                                    <input type="text" value="<?php echo $usuario['nome']; ?>" name="nome" class="form-control">
+                                </div>  
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">E-mail</label>
-                                    <input type="text" name="email" class="form-control">
-                                </div>                            
+                                    <input type="text" value="<?php echo $usuario['email']; ?>" name="email" class="form-control">
+                                </div>  
                             </div>
 
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Créditos</label>
-                                    <input type="text" name="creditos" class="form-control">
-                                </div>                            
+                                    <input type="text" value="<?php echo $usuario['creditos']; ?>" name="creditos" class="form-control">
+                                </div>  
                             </div>
+                            
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Senha</label>
                                     <input type="text" name="senha" class="form-control">
-                                </div>                            
+                                </div>  
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Repita a senha</label>
                                     <input type="text" name="rsenha" class="form-control">
-                                </div>                            
+                                </div>  
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label for="">é admin?</label>
+                                    <label for="">Tipo</label>
                                     <select name="admin" class="form-control">
-                                        <option value="0">Usuário</option>
-                                        <option value="1">Admin</option>
+                                        <option  value="0">Usuário</option>
+                                        <option <?php if($usuario['admin']) echo 'selected'; ?> value="1">Admin</option>
                                     </select>
-                                </div>                            
+                                </div>  
                             </div>
+                           
                             <div class="col-lg-12">
-                                <a type="button" href="index.php?p=gerenciar_usuarios" class="btn btn-primary btn-round"><i class="ti-arrow-left"> Voltar</i></a>
-                                <button type="submit" name="enviar" value="1" class="btn btn-success btn-round float-right"><i class="ti-save"> Salvar</i></button>
+                                <a href="index.php?p=gerenciar_usuarios" class="btn btn-primary btn-round"><i class="ti-arrow-left"></i> Voltar</a>
+                                <button type="submit" name="enviar" value="1" class="btn btn-success btn-round float-right"><i class="ti-save"></i> Salvar</button>
                             </div>
                         </div>
-                    </form>
+                    </form>                    
                 </div>
             </div>
         </div>

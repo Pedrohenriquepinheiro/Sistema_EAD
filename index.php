@@ -1,9 +1,20 @@
 <?php
 
+include('lib/conexao.php');
+include('lib/protect.php');
+protect(0);   
+
+if(!isset($_SESSION))
+    session_start();
+
 $pagina = "inicial.php";
 if(isset($_GET['p'])) {
     $pagina = $_GET['p'] . ".php";
 }
+
+$id_usuario = $_SESSION['usuario']; 
+$sql_query_admin = $mysqli->query("SELECT * FROM usuarios WHERE id = '$id_usuario'") or die($mysqli->error);
+$dados_usuario = $sql_query_admin->fetch_assoc();
 
 ?>
 <!DOCTYPE html>
@@ -77,26 +88,27 @@ if(isset($_GET['p'])) {
                             </li>
                         </ul>
                         <ul class="nav-right">
+                            <?php if(!isset($_SESSION['admin']) || !$_SESSION['admin']) { ?>
                             <li class="header-notification">
                                 <a href="#!">
                                     <i class="ti-money"></i>
-                                    <span class="badge bg-c-pink"></span> 50,00
+                                    <span class="badge bg-c-pink"></span> <?php echo number_format($dados_usuario['creditos'], 2,',', '.') ?>
                                 </a>
                             </li>
+                            <?php } ?>
                             <li class="user-profile header-notification">
                                 <a href="#!">
-                                    <img src="assets/images/avatar-4.jpg" class="img-radius" alt="User-Profile-Image">
-                                    <span>John Doe</span>
+                                    <span><?php echo $dados_usuario['nome']; ?></span>
                                     <i class="ti-angle-down"></i>
                                 </a>
                                 <ul class="show-notification profile-notification">
                                     <li>
-                                        <a href="#">
+                                        <a href="index.php?p=perfil">
                                             <i class="ti-user"></i> Perfil
                                         </a>
                                     </li>
-                                    <li>
-                                        <a href="auth-normal-sign-in.html">
+                                    <li>    
+                                        <a href="logout.php">
                                             <i class="ti-layout-sidebar-left"></i> Sair
                                         </a>
                                     </li>
@@ -113,6 +125,7 @@ if(isset($_GET['p'])) {
                     <nav class="pcoded-navbar">
                         <div class="sidebar_toggle"><a href="#"><i class="icon-close icons"></i></a></div>
                         <div class="pcoded-inner-navbar main-menu">
+                            <?php if(!isset($_SESSION['admin']) || !$_SESSION['admin']) { ?>
                             <div class="pcoded-navigatio-lavel" data-i18n="nav.category.navigation">Menu</div>
                             <ul class="pcoded-item pcoded-left-item">
                                 <li class="">
@@ -144,6 +157,7 @@ if(isset($_GET['p'])) {
                                     </a>
                                 </li>
                             </ul>
+                            <?php } else { ?>
                             <div class="pcoded-navigatio-lavel" data-i18n="nav.category.forms"  menu-title-theme="theme1">Menu</div>
                             <ul class="pcoded-item pcoded-left-item">
                                 <li class="">
@@ -182,6 +196,7 @@ if(isset($_GET['p'])) {
                                     </a>
                                 </li>
                             </ul>
+                            <?php } ?>
                         </div>
                     </nav>
                     <div class="pcoded-content">
@@ -201,11 +216,6 @@ if(isset($_GET['p'])) {
             </div>
         </div>
     </div>
-<div class="fixed-button">
-	<a href="https://codedthemes.com/item/guru-able-admin-template/" target="_blank" class="btn btn-md btn-primary">
-	  <i class="fa fa-shopping-cart" aria-hidden="true"></i> Upgrade To Pro
-	</a>
-</div>
 
     <!-- Warning Section Starts -->
     <!-- Older IE warning message -->
